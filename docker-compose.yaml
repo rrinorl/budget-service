@@ -1,0 +1,37 @@
+version: '3.7'
+
+services:
+  budget-service:
+    container_name: budget-service
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: base
+    volumes:
+      - ./src:/home/node/app/src
+      - ./nodemon.json:/home/node/app/nodemon.json
+    expose:
+      - '4000'
+    ports:
+      - '4000:4000'
+    command: npm run dev
+    environment:
+      PORT: 4000
+      NODE_ENV: development
+      DATABASE_URL: postgresql://postgres:root@postgres:5432/budget?connect_timeout=300
+    depends_on:
+      - postgres
+  postgres:
+    container_name: postgres
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: root
+      POSTGRES_USER: postgres
+      POSTGRES_DB: budget
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/psql
+volumes:
+  db_data: {}
